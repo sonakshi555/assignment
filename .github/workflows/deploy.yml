@@ -20,8 +20,8 @@ jobs:
         script: |
           set -e
           
-          # Navigate or setup the project repository directory
-          PROJECT_DIR="~/devops-assignment"
+          # Use an absolute system path to keep the environment perfectly predictable
+          PROJECT_DIR="/home/ubuntu/devops-assignment"
           if [ ! -d "$PROJECT_DIR" ]; then
             git clone https://github.com/${{ github.repository }}.git $PROJECT_DIR
           fi
@@ -29,10 +29,11 @@ jobs:
           cd $PROJECT_DIR
           git pull origin main
           
+          # CRITICAL FIX: Inject global binary paths explicitly for non-interactive SSH sessions
+          export PATH=$PATH:/usr/bin:/usr/local/bin
+          
           # Manage the backend process using PM2
-          # Checks if the process is running; reloads if active, starts if new.
-          pm2 describe simple-api > /dev/null 2>&1
-          if [ $? -eq 0 ]; then
+          if pm2 describe simple-api > /dev/null 2>&1; then
             echo "Reloading existing backend process..."
             pm2 reload simple-api
           else
