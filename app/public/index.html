@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Ops Infrastructure Portal</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --primary-text: #232f3e;
+            --secondary-text: #545b64;
+            --success-color: #2ecc71;
+            --border-color: #eaeded;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        p {
+            color: var(--secondary-text);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #e8f8f0;
+            color: #147d41;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 15px;
+        }
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cloud Infrastructure Active</h1>
+        <p>This static landing page is handled natively by Nginx edge routing via memory-mapped file access rules.</p>
+        <div class="status-badge">
+            <span class="status-dot"></span> System Live
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Deploy to AWS EC2 via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          set -e
+          
+          # Navigate or setup the project repository directory
+          PROJECT_DIR="~/devops-assignment"
+          if [ ! -d "$PROJECT_DIR" ]; then
+            git clone https://github.com/${{ github.repository }}.git $PROJECT_DIR
+          fi
+          
+          cd $PROJECT_DIR
+          git pull origin main
+          
+          # Manage the backend process using PM2
+          # Checks if the process is running; reloads if active, starts if new.
+          pm2 describe simple-api > /dev/null 2>&1
+          if [ $? -eq 0 ]; then
+            echo "Reloading existing backend process..."
+            pm2 reload simple-api
+          else
+            echo "Starting new backend process..."
+            pm2 start app/index.js --name "simple-api" --env PORT=8080
+          fi
+          
+          # Save PM2 state to ensure it survives server reboots
+          pm2 save
+          
+          # Ensure Nginx config is valid and apply changes
+          sudo nginx -t
+          sudo systemctl reload nginx
+          
+          echo "Deployment completed successfully!"
