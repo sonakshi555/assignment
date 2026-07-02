@@ -20,13 +20,6 @@ jobs:
         script: |
           set -e
           
-          # Force load the user environment profiles where Node/NPM paths live
-          if [ -f ~/.profile ]; then source ~/.profile; fi
-          if [ -f ~/.bashrc ]; then source ~/.bashrc; fi
-          
-          # Explicitly add common Node/NPM binary paths just in case
-          export PATH=$PATH:/usr/bin:/usr/local/bin:$(npm get prefix 2>/dev/null)/bin
-          
           PROJECT_DIR="/home/ubuntu/devops-assignment"
           if [ ! -d "$PROJECT_DIR" ]; then
             git clone https://github.com/${{ github.repository }}.git $PROJECT_DIR
@@ -35,24 +28,19 @@ jobs:
           cd $PROJECT_DIR
           git pull origin main
           
-          # Determine the executable handle for PM2 (direct binary vs npx wrapper)
-          if command -v pm2 &> /dev/null; then
-            PM2_CMD="pm2"
-          else
-            echo "Global PM2 alias missing; falling back to npx wrapper tool execution tier..."
-            PM2_CMD="npx pm2"
-          fi
+          # Direct invocation using the verified system binary path
+          PM2_PATH="/usr/bin/pm2"
           
-          # Process management lifecycle execution
-          if $PM2_CMD describe simple-api > /dev/null 2>&1; then
+          # Process management execution loop
+          if $PM2_PATH describe simple-api > /dev/null 2>&1; then
             echo "Reloading existing backend process..."
-            $PM2_CMD reload simple-api
+            $PM2_PATH reload simple-api
           else
             echo "Starting new backend process..."
-            $PM2_CMD start app/index.js --name "simple-api" --env PORT=8080
+            $PM2_PATH start app/index.js --name "simple-api" --env PORT=8080
           fi
           
-          $PM2_CMD save
+          $PM2_PATH save
           
           # Ensure Nginx config is valid and apply changes
           sudo nginx -t
